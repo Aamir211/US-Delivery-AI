@@ -1,0 +1,176 @@
+{
+  "run_timestamp": "2026-08-27T20:29:28.696409+00:00",
+  "task1_results": [
+    {
+      "test_id": "task1-normal-performance",
+      "passed": true,
+      "quality_score": 1.0,
+      "explanation": "All deterministic acceptance checks passed.",
+      "checks": {
+        "valid_product_area": true,
+        "valid_issue_category": true,
+        "valid_urgency": true,
+        "required_fields": true,
+        "kb_match_validity": true,
+        "kb_document_exists": true,
+        "no_match_behavior": true,
+        "no_detectable_unsupported_claim": true,
+        "expected_issue_category": true
+      }
+    },
+    {
+      "test_id": "task1-high-urgency-data-loss",
+      "passed": true,
+      "quality_score": 1.0,
+      "explanation": "All deterministic acceptance checks passed.",
+      "checks": {
+        "valid_product_area": true,
+        "valid_issue_category": true,
+        "valid_urgency": true,
+        "required_fields": true,
+        "kb_match_validity": true,
+        "kb_document_exists": true,
+        "no_match_behavior": true,
+        "no_detectable_unsupported_claim": true,
+        "expected_issue_category": true,
+        "expected_urgency": true
+      }
+    },
+    {
+      "test_id": "task1-known-kb-error",
+      "passed": true,
+      "quality_score": 1.0,
+      "explanation": "All deterministic acceptance checks passed.",
+      "checks": {
+        "valid_product_area": true,
+        "valid_issue_category": true,
+        "valid_urgency": true,
+        "required_fields": true,
+        "kb_match_validity": true,
+        "kb_document_exists": true,
+        "no_match_behavior": true,
+        "no_detectable_unsupported_claim": true,
+        "expected_known_issue_match": true,
+        "expected_document": true
+      }
+    },
+    {
+      "test_id": "task1-ambiguous-onboarding",
+      "passed": true,
+      "quality_score": 1.0,
+      "explanation": "All deterministic acceptance checks passed.",
+      "checks": {
+        "valid_product_area": true,
+        "valid_issue_category": true,
+        "valid_urgency": true,
+        "required_fields": true,
+        "kb_match_validity": true,
+        "kb_document_exists": true,
+        "no_match_behavior": true,
+        "no_detectable_unsupported_claim": true,
+        "expected_known_issue_match": true
+      }
+    },
+    {
+      "test_id": "task1-adversarial-unsupported-kb-assumption",
+      "passed": true,
+      "quality_score": 1.0,
+      "explanation": "All deterministic acceptance checks passed.",
+      "checks": {
+        "valid_product_area": true,
+        "valid_issue_category": true,
+        "valid_urgency": true,
+        "required_fields": true,
+        "kb_match_validity": true,
+        "kb_document_exists": true,
+        "no_match_behavior": true,
+        "no_detectable_unsupported_claim": true,
+        "expected_known_issue_match": true
+      }
+    }
+  ],
+  "task2_results": [
+    {
+      "test_id": "task2-healthy-account",
+      "passed": true,
+      "quality_score": 1.0,
+      "explanation": "All deterministic acceptance checks passed.",
+      "checks": {
+        "account_lookup": true,
+        "ninety_day_filter": true,
+        "exactly_three_sections": true,
+        "summary_sentence_count": true,
+        "evidence_supported_risks": true,
+        "valid_ticket_ids_and_exact_quotes": true,
+        "recommended_talking_points": true,
+        "expected_health_status": true,
+        "expected_recent_ticket_ids": true
+      }
+    },
+    {
+      "test_id": "task2-open-risks",
+      "passed": true,
+      "quality_score": 1.0,
+      "explanation": "All deterministic acceptance checks passed.",
+      "checks": {
+        "account_lookup": true,
+        "ninety_day_filter": true,
+        "exactly_three_sections": true,
+        "summary_sentence_count": true,
+        "evidence_supported_risks": true,
+        "valid_ticket_ids_and_exact_quotes": true,
+        "recommended_talking_points": true,
+        "expected_recent_ticket_ids": true,
+        "required_flag_types": true
+      }
+    },
+    {
+      "test_id": "task2-escalation-signals",
+      "passed": true,
+      "quality_score": 1.0,
+      "explanation": "All deterministic acceptance checks passed.",
+      "checks": {
+        "account_lookup": true,
+        "ninety_day_filter": true,
+        "exactly_three_sections": true,
+        "summary_sentence_count": true,
+        "evidence_supported_risks": true,
+        "valid_ticket_ids_and_exact_quotes": true,
+        "recommended_talking_points": true,
+        "expected_recent_ticket_ids": true,
+        "required_flag_types": true
+      }
+    },
+    {
+      "test_id": "task2-churn-risk",
+      "passed": true,
+      "quality_score": 1.0,
+      "explanation": "All deterministic acceptance checks passed.",
+      "checks": {
+        "account_lookup": true,
+        "ninety_day_filter": true,
+        "exactly_three_sections": true,
+        "summary_sentence_count": true,
+        "evidence_supported_risks": true,
+        "valid_ticket_ids_and_exact_quotes": true,
+        "recommended_talking_points": true,
+        "expected_recent_ticket_ids": true,
+        "required_flag_types": true
+      }
+    },
+    {
+      "test_id": "task2-adversarial-missing-account",
+      "passed": true,
+      "quality_score": 1.0,
+      "explanation": "All deterministic acceptance checks passed.",
+      "checks": {
+        "graceful_missing_account": true
+      }
+    }
+  ],
+  "task1_aggregate_score": 1.0,
+  "task2_aggregate_score": 1.0,
+  "overall_score": 1.0,
+  "passed_count": 10,
+  "failed_count": 0
+}

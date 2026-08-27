@@ -1,0 +1,32 @@
+[
+  {
+    "test_id": "task1-normal-performance",
+    "description": "Real performance report with a named product area.",
+    "input": {"source_ticket_id": "TKT-10197"},
+    "acceptance_criteria": {"expected_issue_category": "Performance"}
+  },
+  {
+    "test_id": "task1-high-urgency-data-loss",
+    "description": "Real P1-style missing-data report with business-continuity impact.",
+    "input": {"source_ticket_id": "TKT-10088"},
+    "acceptance_criteria": {"expected_issue_category": "Data Loss", "expected_urgency": "P1"}
+  },
+  {
+    "test_id": "task1-known-kb-error",
+    "description": "Real ticket containing the documented DEPENDENCY_UNAVAILABLE error pattern.",
+    "input": {"source_ticket_id": "TKT-10236"},
+    "acceptance_criteria": {"expected_known_issue_match": true, "expected_document": "knowledge-base/troubleshooting/performance-and-integrations.md"}
+  },
+  {
+    "test_id": "task1-ambiguous-onboarding",
+    "description": "Real bulk-import request with ambiguous source labels and no reliable supplied knowledge-base issue match.",
+    "input": {"source_ticket_id": "TKT-10001"},
+    "acceptance_criteria": {"expected_known_issue_match": false}
+  },
+  {
+    "test_id": "task1-adversarial-unsupported-kb-assumption",
+    "description": "Real webhook delivery report that must not be treated as a known issue solely through broad lexical overlap.",
+    "input": {"source_ticket_id": "TKT-10002"},
+    "acceptance_criteria": {"expected_known_issue_match": false}
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "test_id": "task2-healthy-account",
+    "description": "Healthy real account with no exact-ID linked tickets in the 90-day window.",
+    "account_id": "ACC-3033",
+    "acceptance_criteria": {"expected_health_status": "Healthy", "expected_recent_ticket_ids": []}
+  },
+  {
+    "test_id": "task2-open-risks",
+    "description": "At-risk account with inactive usage, account-level open-ticket metadata, and one exact-ID ticket.",
+    "account_id": "ACC-3336",
+    "acceptance_criteria": {"expected_recent_ticket_ids": ["TKT-10293"], "required_flag_types": ["Open Support Risk", "Churn Risk"]}
+  },
+  {
+    "test_id": "task2-escalation-signals",
+    "description": "At-risk account with supplied escalation notes and no exact-ID recent tickets.",
+    "account_id": "ACC-8113",
+    "acceptance_criteria": {"required_flag_types": ["Escalation Signal"], "expected_recent_ticket_ids": []}
+  },
+  {
+    "test_id": "task2-churn-risk",
+    "description": "Churning account whose health, declining usage, and escalation notes support churn-risk flags.",
+    "account_id": "ACC-2944",
+    "acceptance_criteria": {"required_flag_types": ["Churn Risk"], "expected_recent_ticket_ids": []}
+  },
+  {
+    "test_id": "task2-adversarial-missing-account",
+    "description": "An account ID found in the supplied tickets but absent from the supplied accounts dataset must fail gracefully.",
+    "account_id": "ACC-1003",
+    "acceptance_criteria": {"expected_error": "not_found"}
+  }
+]

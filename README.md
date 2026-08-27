@@ -1,119 +1,179 @@
-# US Delivery Internship — Starter Dataset
+# US Delivery AI
 
-This repository contains the mock dataset for the **US Delivery Internship Technical Task Round**.  
-Candidates should use this data exclusively for their submissions.
+## Project Overview
 
----
+US Delivery AI is a Python/FastAPI submission for technical-support and
+technical-account-management workflows. It reads only the supplied synthetic
+ticket, account, and Markdown knowledge-base data. Task 1 turns a raw support
+ticket into a validated triage result; Task 2 turns an exact account ID into a
+deterministic, evidence-grounded TAM brief. Task 3 provides a repeatable
+evaluation harness, and [DESIGN.md](DESIGN.md) documents production trade-offs.
 
-## Repository Structure
+## Architecture
 
-```
-starter-repo/
-├── data/
-│   ├── tickets.json          # 500 synthetic support tickets
-│   └── accounts.json         # 50 synthetic customer account summaries
-├── knowledge-base/
-│   ├── products/
-│   │   ├── databridge-pro.md
-│   │   ├── cloudsync.md
-│   │   ├── analyticshub.md
-│   │   ├── securevault.md
-│   │   └── workflowengine.md
-│   ├── troubleshooting/
-│   │   ├── authentication-sso.md
-│   │   └── performance-and-integrations.md
-│   ├── billing/
-│   │   └── billing-and-plans.md
-│   └── onboarding/
-│       └── onboarding-guide.md
-└── DATA_SCHEMA.md            # Field-level schema documentation
+```mermaid
+flowchart LR
+  T[data/tickets.json] --> L[Read-only validated repository]
+  A[data/accounts.json] --> L
+  K[knowledge-base Markdown] --> R[Local lexical retrieval]
+  R --> T1[Task 1 triage service]
+  L --> T2[Task 2 account brief service]
+  T1 --> API[FastAPI]
+  T2 --> API
+  T1 --> E[Deterministic evaluator]
+  T2 --> E
 ```
 
----
+- The repository validates the supplied JSON with Pydantic and keeps indexes in
+  memory; it never edits data files.
+- Retrieval chunks the local Markdown corpus at `---` boundaries and preserves
+  document paths/headings. It does not use web search or external documents.
+- Task 1 accepts plain text or JSON, retrieves local KB evidence, and returns a
+  constrained triage result. An optional OpenAI structured-output path is used
+  only if a local API key is configured; otherwise deterministic local logic is
+  used.
+- Task 2 exact-joins `account_id`, uses timezone-aware `created_at` values for
+  the 90-day window, and produces exactly three source-grounded sections.
+- FastAPI exposes both services; `evals/` exercises deterministic quality gates.
 
-## Data Description
+## Requirements
 
-### `data/tickets.json`
+- Python 3.13 (the included virtual environment and CI use 3.13)
+- Dependencies in `requirements.txt`: FastAPI, Pydantic, Uvicorn, OpenAI SDK,
+  pytest, httpx (API tests), and Streamlit (optional local UI).
 
-500 synthetic support tickets submitted by fictitious enterprise customers. Each ticket represents a realistic interaction between a customer and the technical support team.
+## Setup
 
-**Key fields:**
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `ticket_id` | string | Unique ticket identifier (e.g., `TKT-10042`) |
-| `account_id` | string | Links to an account in `accounts.json` |
-| `company` | string | Customer company name |
-| `subject` | string | Ticket subject line |
-| `body` | string | Full ticket body text |
-| `product` | string | Product the ticket relates to |
-| `product_area` | string | Module within the product |
-| `category` | string | Issue type: Bug, Feature Request, How-To, Performance, Billing, Integration, Onboarding, Data Loss |
-| `urgency` | string | P1 (critical) to P4 (low) |
-| `status` | string | Open, In Progress, Pending Customer, Resolved, Closed |
-| `plan_tier` | string | Starter, Professional, Business, Enterprise |
-| `assigned_agent` | string | Support agent name |
-| `created_at` | ISO 8601 | Ticket creation timestamp |
-| `updated_at` | ISO 8601 | Last update timestamp |
-| `tags` | array | Free-form tags |
-| `channel` | string | Submission channel: email, portal, chat, phone |
-| `satisfaction_score` | int\|null | CSAT score 1–5, or null if not submitted |
+The single FastAPI entry point is `uvicorn app.main:app --reload`. Open
+`http://127.0.0.1:8000/docs` for the interactive API documentation.
 
-See [DATA_SCHEMA.md](DATA_SCHEMA.md) for full schema with examples.
+## Environment Variables
 
----
+Copy `.env.example` to `.env` for local configuration. `.env` is ignored by
+Git and must never be committed.
 
-### `data/accounts.json`
+| Variable | Purpose | Default |
+|---|---|---|
+| `APP_ENV` | Runtime label | `development` |
+| `APP_HOST` / `APP_PORT` | Local server binding | `127.0.0.1` / `8000` |
+| `LOG_LEVEL` | Logging level | `INFO` |
+| `OPENAI_API_KEY` | Optional Task 1 structured-output key | blank |
+| `OPENAI_MODEL` | Optional Task 1 model | `gpt-4o-mini` |
 
-50 synthetic customer account summaries, each representing a fictional enterprise customer's relationship with the platform.
+No real key is stored in this repository. With no `OPENAI_API_KEY`, Task 1 uses
+its deterministic local path.
 
-**Key fields:**
+## Task 1 — Intelligent Ticket Triage
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `account_id` | string | Unique account identifier |
-| `company` | string | Company name |
-| `tam` | string | Assigned Technical Account Manager |
-| `plan_tier` | string | Current plan |
-| `arr_usd` | int | Annual recurring revenue in USD |
-| `seats_licensed` | int | Number of licensed seats |
-| `seats_active` | int | Seats with activity in last 30 days |
-| `products` | array | Products in use |
-| `health_status` | string | Healthy, At Risk, Churning, or New |
-| `usage_trend` | string | Increasing, Stable, Declining, or Inactive |
-| `open_tickets` | int | Currently open support tickets |
-| `p1_tickets_last_30d` | int | P1 tickets in last 30 days |
-| `renewal_date` | YYYY-MM-DD | Contract renewal date |
-| `last_qbr_date` | YYYY-MM-DD | Date of last Quarterly Business Review |
-| `escalation_notes` | array | Free-text escalation observations |
-| `nps_score` | int\|null | Net Promoter Score 1–10, or null |
-| `primary_contact` | object | `name` and `title` of main contact |
-| `integrations_active` | array | Active third-party integrations |
-| `region` | string | Geographic region |
-| `industry` | string | Customer industry vertical |
+`POST /triage` accepts JSON containing `subject` and/or `body`, or a
+`text/plain` request body. It returns product area, category, P1–P4 urgency,
+reasoning, known-issue state, local KB document path when applicable, responder
+team, and a cautious first response.
 
----
+```powershell
+Invoke-RestMethod -Method Post http://127.0.0.1:8000/triage `
+  -ContentType 'application/json' `
+  -Body '{"subject":"Pipeline timeout","body":"Our pipeline reports ERR_CONNECTION_TIMEOUT after 30s."}'
+```
 
-### `knowledge-base/`
+Example response excerpt:
 
-Markdown documentation files representing a product knowledge base. These docs contain:
+```json
+{
+  "product_area": "Pipeline Monitoring",
+  "issue_category": "Performance",
+  "urgency": "P3",
+  "known_issue_match": true,
+  "relevant_knowledge_base_document": "knowledge-base/troubleshooting/performance-and-integrations.md",
+  "recommended_responder_team": "Technical Support"
+}
+```
 
-- Product feature descriptions and configuration references
-- Common error codes and their meanings
-- Step-by-step troubleshooting guides
-- Plan limits and pricing information
-- Onboarding checklists and training paths
+The reusable function is `app.services.triage.triage_ticket`.
 
-Candidates should use these docs as the retrieval corpus for knowledge-base lookup features.
+## Task 2 — TAM Account Health Summariser
 
----
+`GET /accounts/{account_id}/brief` returns exactly `Executive Summary`, `Open
+Risks & Flagged Issues`, and `Recommended Talking Points`.
 
-## Usage Notes
+```powershell
+Invoke-RestMethod http://127.0.0.1:8000/accounts/ACC-3336/brief
+```
 
-- All data is **entirely synthetic**. Company names, contact details, and ticket content are fictional.
-- Ticket `account_id` values do not always match an entry in `accounts.json` — this is intentional. Handle missing account lookups gracefully.
-- The `escalation_notes` field in accounts contains plain-text observations. These are designed to test churn-risk signal detection.
-- Some tickets are deliberately ambiguous in category or urgency — this tests edge-case handling.
+Example response excerpt:
 
----
+```json
+{
+  "Executive Summary": ["Omni Consumer Products is recorded as At Risk..."],
+  "Open Risks & Flagged Issues": {"statement":"Material account risks or escalation signals are listed below.","flags":[]},
+  "Recommended Talking Points": ["Review the recorded At Risk health status..."]
+}
+```
 
+The reusable function is `app.services.account_brief.summarize_account`.
+
+## Evaluation and Testing
+
+Run the deterministic harness (it rewrites `evals/eval_report.json`):
+
+```powershell
+python -m evals.evaluator
+```
+
+The report contains per-case pass/fail, 0–1 quality scores, explanations, and
+Task 1/Task 2/overall aggregates. Run the full test suite with:
+
+```powershell
+python -m pytest -q
+```
+
+## Knowledge Base
+
+The nine files under `knowledge-base/` are the entire retrieval corpus. Document
+paths are preserved in results; a no-match response does not invent a document.
+
+## Optional UI
+
+The included Streamlit interface reuses the existing Python services without
+duplicating business logic:
+
+```powershell
+streamlit run streamlit_app.py
+```
+
+## Project Structure
+
+```text
+app/                 FastAPI entry point, models, retrieval, and services
+data/                Supplied synthetic account and ticket data
+knowledge-base/      Supplied Markdown retrieval corpus
+prompts/             Versioned Task 1 and Task 2 prompts and changelog
+evals/               Cases, evaluator, and generated report
+tests/               Unit, API, and evaluation tests
+DESIGN.md            Task 4 production design note
+SUBMISSION_AUDIT.md  Final requirement matrix
+streamlit_app.py     Optional thin local UI
+```
+
+## Limitations
+
+- The supplied data has very few exact account/ticket joins; Task 2 deliberately
+  does not guess from conflicting company names.
+- Deterministic triage uses rules and lexical retrieval, so ambiguous prose may
+  need human review.
+- The optional LLM path is implemented only for Task 1; Task 2 is deterministic.
+- The security controls are local-development basics, not a production security
+  program; see [DESIGN.md](DESIGN.md).
+
+## Bonus Features
+
+- Prompt versioning and changelog in `prompts/`.
+- GitHub Actions CI runs tests and evaluations.
+- Optional Streamlit UI.
